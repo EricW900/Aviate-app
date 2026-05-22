@@ -1,0 +1,16 @@
+https://github.com/Deepakcodez/node-express-ts-prisma-biolerplate
+https://github.com/Deepakcodez/node-express-ts-prisma-biolerplate/blob/master/docs/ARCHITECTURE.md
+
+login (user): admin
+password: admin
+
+https://ui.shadcn.com/
+https://shadcntemplates.com/theme/dotnize-react-tanstarter
+
+TEMPLATE ESCOLHIDO
+https://www.shadcn.io/template/satnaing-shadcn-admin
+https://github.com/satnaing/shadcn-admin
+
+
+description
+AVIATE is an airline operations management system designed to manage and simulate the core operations of an airline company. It allows users to handle flights, aircraft, routes, airports, crew assignments, and system users in a centralized and organized way. The system is focused on operational control, making it possible to create, edit, and monitor flights while ensuring that aircraft availability, crew assignments, and route details are properly coordinated. The platform helps manage flight schedules, assign crew members to specific roles, and maintain information about aircraft and their capabilities. It also provides visibility over routes between airports, including origin and destination details. AVIATE is intended to give a clear and structured overview of airline operations, helping ensure that all resources are correctly allocated and that flights run according to plan.
