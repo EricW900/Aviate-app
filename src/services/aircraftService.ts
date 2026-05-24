@@ -59,7 +59,7 @@ export class AircraftService {
             throw new NotFoundError("Aircraft not found");
         }
 
-        const model = await prisma.aircraft.findUnique({
+        const model = await prisma.aircraftModel.findUnique({
             where: { id: data.modelId }
         });
 
@@ -103,6 +103,10 @@ export class AircraftService {
                 select: {
                     id: true,
                     prefix: true,
+                    capacity: true,
+                    rangeKm: true,
+                    status: true,
+                    modelId: true,
 
                     model: {
                         select: {
@@ -115,10 +119,6 @@ export class AircraftService {
                             }
                         }
                     }
-                },
-
-                where: {
-                    status: "ACTIVE"
                 }
             });
         } catch (error) {

@@ -24,7 +24,7 @@ export class aircraftModelController {
             const result = await aircraftModelService.bulkGet(req.body, req.user);
 
             ApiResponseUtil.success(
-                response,
+                res,
                 "Aircraft model found",
                 result,
                 201
@@ -39,13 +39,28 @@ export class aircraftModelController {
             const result = await aircraftModelService.list(req.body, req.user);
 
             ApiResponseUtil.success(
-                response,
+                res,
                 "Aircraft models list found",
                 result,
                 201
             )
         } catch (error) {
             next (error);
+        }
+    }
+
+    static async edit(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+        try {
+            const result = await aircraftModelService.edit(req.body, req.user);
+
+            ApiResponseUtil.success(
+                res,
+                "Aircraft edited",
+                result,
+                201
+            )
+        } catch (error) {
+            next(error);
         }
     }
 }

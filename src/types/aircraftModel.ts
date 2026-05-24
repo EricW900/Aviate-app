@@ -10,3 +10,9 @@ export interface getAircraftModelRequest {
 export interface listAircraftModelRequest {
 
 }
+
+export interface editAircraftModelRequest {
+    aircraftModelId: string;
+    manufacturerId: string;
+    aircraftModelName: string;
+}

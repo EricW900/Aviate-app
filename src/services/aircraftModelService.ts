@@ -1,6 +1,6 @@
 import prisma from "../config/database";
 import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
-import { createAircraftModelRequest, getAircraftModelRequest, listAircraftModelRequest } from "../types/aircraftModel";
+import { createAircraftModelRequest, editAircraftModelRequest, getAircraftModelRequest, listAircraftModelRequest } from "../types/aircraftModel";
 
 export class aircraftModelService {
     static async create(req: createAircraftModelRequest, user: any) {
@@ -55,7 +55,9 @@ export class aircraftModelService {
     static async list(req: listAircraftModelRequest, user: any) {
         const aircraftsModelsList = await prisma.aircraftModel.findMany({
             select: {
+                id: true,
                 name: true,
+                manufacturer: true,
             }
         });
 
@@ -64,5 +66,38 @@ export class aircraftModelService {
         }
 
         return aircraftsModelsList;
+    }
+
+    static async edit(req: editAircraftModelRequest, user: any) {
+        const aircraftModelExists = await prisma.aircraftModel.findFirst({
+            where: {
+                id: req.aircraftModelId
+            }
+        });
+
+        if (!aircraftModelExists) {
+            throw new NotFoundError("Aircraft Model Doesn't exists");
+        }
+
+        const manufacturerExists = await prisma.manufacturer.findFirst({
+            where: {
+                id: req.manufacturerId
+            }
+        });
+
+        if (!manufacturerExists) {
+            throw new NotFoundError("Manufacturer doesn't exists");
+        }
+
+        const aircraftModelUpdate = await prisma.aircraftModel.update({
+            where: {
+                id: req.aircraftModelId
+            }, data: {
+                name: req.aircraftModelName,
+                manufacturerId: req.manufacturerId
+            }
+        });
+
+        return aircraftModelUpdate;
     }
 }

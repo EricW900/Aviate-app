@@ -31,9 +31,9 @@ export class manufacturerService {
     }
 
     static async edit(req: editManufacturerRequest, user: any) {
-        if (!user.isActive) {
-            throw new ValidationError("Inactive users cannot edit a manufacturer");
-        };
+        // if (!user.isActive) {
+        //     throw new ValidationError("Inactive users cannot edit a manufacturer");
+        // };
 
         const existing = await prisma.manufacturer.findUnique({
             where: {
@@ -63,6 +63,8 @@ export class manufacturerService {
             where: {
                 active: true,
             }, select: {
+                // Try to return the Id
+                id: true,
                 name: true,
                 active: true,
             }
