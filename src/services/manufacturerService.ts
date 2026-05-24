@@ -1,6 +1,6 @@
 import prisma from "../config/database";
 import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
-import { createManufacturerRequest, editManufacturerRequest } from "../types/manufacturer";
+import { createManufacturerRequest, editManufacturerRequest, listManufacturerRequest } from "../types/manufacturer";
 
 export class manufacturerService {
     static async create(req: createManufacturerRequest, user: any) {
@@ -58,4 +58,16 @@ export class manufacturerService {
         return manufacturer;
     }
 
+    static async list(req: listManufacturerRequest, user: any) {
+        const manufacturerList = await prisma.manufacturer.findMany({
+            where: {
+                active: true,
+            }, select: {
+                name: true,
+                active: true,
+            }
+        });
+
+        return manufacturerList;
+    }
 }

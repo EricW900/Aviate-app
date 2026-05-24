@@ -11,3 +11,7 @@ export const editManufacturerSchema = Joi.object({
     name: Joi.string().uppercase().required().min(2).max(100),
     active: Joi.boolean(),
 })
+
+export const listManufacturerSchema = Joi.object({
+
+})

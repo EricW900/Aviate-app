@@ -33,4 +33,19 @@ export class manufacturerController {
             next(error);
         }
     }
+
+    static async list(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+        try {
+            const result = await manufacturerService.list(req.body, req.user);
+
+            ApiResponseUtil.success(
+                res,
+                "Manufacturer list found successfully",
+                result,
+                201
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
 }

@@ -33,4 +33,19 @@ export class aircraftModelController {
             next(error);
         }
     }
+
+    static async list(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+        try {
+            const result = await aircraftModelService.list(req.body, req.user);
+
+            ApiResponseUtil.success(
+                response,
+                "Aircraft models list found",
+                result,
+                201
+            )
+        } catch (error) {
+            next (error);
+        }
+    }
 }

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { manufacturerController } from "../controllers/manufacturerController";
-import { createManufacturerSchema, editManufacturerSchema } from "../validations/manufacturerValidations";
+import { createManufacturerSchema, editManufacturerSchema, listManufacturerSchema } from "../validations/manufacturerValidations";
 import { validateRequest } from "../middleware/validation";
 import { authenticate } from "../middleware/auth";
 
@@ -28,6 +28,13 @@ router.post(
     authenticate,
     validateRequest(editManufacturerSchema),
     manufacturerController.edit,
+)
+
+router.get(
+    "/list",
+    authenticate,
+    validateRequest(listManufacturerSchema),
+    manufacturerController.list,
 )
 
 export default router;

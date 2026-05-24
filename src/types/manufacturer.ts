@@ -7,3 +7,7 @@ export interface editManufacturerRequest {
     name: string;
     active: boolean;
 }
+
+export interface listManufacturerRequest {
+
+}

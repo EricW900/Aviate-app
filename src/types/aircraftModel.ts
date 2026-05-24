@@ -6,3 +6,7 @@ export interface createAircraftModelRequest {
 export interface getAircraftModelRequest {
     aircraftId: string[];
 }
+
+export interface listAircraftModelRequest {
+
+}

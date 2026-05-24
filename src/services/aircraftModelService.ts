@@ -1,6 +1,6 @@
 import prisma from "../config/database";
 import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
-import { createAircraftModelRequest, getAircraftModelRequest } from "../types/aircraftModel";
+import { createAircraftModelRequest, getAircraftModelRequest, listAircraftModelRequest } from "../types/aircraftModel";
 
 export class aircraftModelService {
     static async create(req: createAircraftModelRequest, user: any) {
@@ -50,5 +50,19 @@ export class aircraftModelService {
         }
 
         return aircraft;
+    }
+
+    static async list(req: listAircraftModelRequest, user: any) {
+        const aircraftsModelsList = await prisma.aircraftModel.findMany({
+            select: {
+                name: true,
+            }
+        });
+
+        if (aircraftsModelsList.length == 0) {
+            throw new NotFoundError("One or more aicraft models not found");
+        }
+
+        return aircraftsModelsList;
     }
 }
