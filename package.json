@@ -1,0 +1,27 @@
+{
+  "name": "aviate-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=aviate-frontend\" \"npm run dev --workspace=express-auth-backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EricW900/Aviate-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/EricW900/Aviate-app/issues"
+  },
+  "homepage": "https://github.com/EricW900/Aviate-app#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
