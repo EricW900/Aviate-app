@@ -38,3 +38,15 @@ export interface AuthResponse {
   };
   token: string;
 }
+
+export interface EditUserRequest {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    role?: role_type;
+}
+
+// export interface ListUsersRequest {
+
+// }
+

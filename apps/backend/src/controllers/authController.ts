@@ -43,4 +43,34 @@ export class AuthController {
       next(error);
     }
   }
+
+  static async listUsers(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const users = await AuthService.listUsers(req.user?.userId!);
+
+      ApiResponseUtil.success(res, "User list retrieved successfully", users);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async editUser(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { userId, ...data } = req.body;
+
+        const result = await AuthService.editUser(userId, data);
+
+        ApiResponseUtil.success(res, "User updated successfully", result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -62,8 +62,7 @@ export class manufacturerService {
         const manufacturerList = await prisma.manufacturer.findMany({
             where: {
                 active: true,
-            }, select: {
-                // Try to return the Id
+            }, select: {                
                 id: true,
                 name: true,
                 active: true,

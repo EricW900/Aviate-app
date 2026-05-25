@@ -7,8 +7,10 @@ import {
     listManufacturers,
 } from "../services/aircraftModelService";
 
-import type { AircraftModel } from "../services/aircraftModelService";
-import type { Manufacturer } from "../services/aircraftService";
+import type {
+    AircraftModel,
+    Manufacturer,
+} from "../services/aircraftModelService";
 
 const ModelSection = () => {
     const { showAlert } = useAlert();
@@ -29,30 +31,38 @@ const ModelSection = () => {
         try {
             setLoading(true);
 
-            const [modelsResponse, manufacturersResponse] =
-                await Promise.all([listAircraftModels(), listManufacturers()]);
+            const [modelsResult, manufacturersResult] = await Promise.allSettled([
+                listAircraftModels(),
+                listManufacturers(),
+            ]);
 
-            const modelsData =
-                modelsResponse.data?.data ??
-                modelsResponse.data?.models ??
-                modelsResponse.data ??
-                [];
+            if (manufacturersResult.status === "fulfilled") {
+                const manufacturersData =
+                    manufacturersResult.value.data?.data ??
+                    manufacturersResult.value.data?.manufacturers ??
+                    manufacturersResult.value.data ??
+                    [];
 
-            const manufacturersData =
-                manufacturersResponse.data?.data ??
-                manufacturersResponse.data?.manufacturers ??
-                manufacturersResponse.data ??
-                [];
+                setManufacturers(
+                    Array.isArray(manufacturersData) ? manufacturersData : []
+                );
+            } else {
+                console.error("Failed to load manufacturers:", manufacturersResult.reason);
+                showAlert("Failed to load manufacturers", "error");
+            }
 
-            setModels(Array.isArray(modelsData) ? modelsData : []);
-            setManufacturers(
-                Array.isArray(manufacturersData) ? manufacturersData : []
-            );
-        } catch (error: any) {
-            showAlert(
-                error?.response?.data?.message || "Failed to load models",
-                "error"
-            );
+            if (modelsResult.status === "fulfilled") {
+                const modelsData =
+                    modelsResult.value.data?.data ??
+                    modelsResult.value.data?.models ??
+                    modelsResult.value.data ??
+                    [];
+
+                setModels(Array.isArray(modelsData) ? modelsData : []);
+            } else {
+                console.error("Failed to load aircraft models:", modelsResult.reason);
+                showAlert("Failed to load aircraft models", "error");
+            }
         } finally {
             setLoading(false);
         }

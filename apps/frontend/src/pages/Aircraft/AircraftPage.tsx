@@ -57,12 +57,6 @@ const AircraftPage = () => {
       {activeTab === "manufacturers" && <ManufacturerSection />}
       {activeTab === "models" && <ModelSection />}
       {activeTab === "aircraft" && <AircraftSection />}
-
-      {/* {activeTab === "aircraft" && (
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
-          Aircraft coming next.
-        </div>
-      )} */}
     </div>
   );
 };

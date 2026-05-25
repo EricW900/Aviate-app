@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
-import { RegisterRequest, LoginRequest, AuthResponse } from "../types";
+import { RegisterRequest, LoginRequest, AuthResponse, EditUserRequest } from "../types";
 import { JwtUtil } from "../utils/jwt";
 import {
   ConflictError,
@@ -124,5 +124,56 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  static async listUsers(requestingUserId: string) {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        employee_code: true,
+        isActive: true,
+        createdAt: true,
+      },
+    });
+
+    return users;
+  }
+
+  static async editUser(userId: string, data: EditUserRequest) {
+      const { email, firstName, lastName, role } = data;
+
+      const user = await prisma.user.findUnique({
+          where: { id: userId },
+      });
+
+      if (!user) {
+          throw new NotFoundError("User not found");
+      }
+
+      if (email) {
+          const emailOwner = await prisma.user.findUnique({
+              where: { email },
+          });
+
+          if (emailOwner && emailOwner.id !== userId) {
+              throw new ConflictError("Email already exists");
+          }
+      }
+
+      const updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: {
+              email,
+              firstName,
+              lastName,
+              role,
+          },
+      });
+
+      return updatedUser;
   }
 }

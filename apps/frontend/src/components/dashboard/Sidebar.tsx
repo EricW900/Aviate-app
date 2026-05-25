@@ -4,6 +4,7 @@ const navItems = [
   { label: "Dashboard", to: "/dashboard" },
   { label: "Aircrafts", to: "/dashboard/aircrafts" },
   { label: "Routes", to: "/dashboard/routes" },
+  { label: "Users", to: "/dashboard/user"},
 ];
 
 const Sidebar = () => {
@@ -24,6 +25,7 @@ const Sidebar = () => {
           <NavLink
             key={item.to}
             to={item.to}
+            end
             className={({ isActive }) =>
               [
                 "block rounded-lg px-4 py-3 text-sm font-medium transition",

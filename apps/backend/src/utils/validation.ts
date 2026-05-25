@@ -11,6 +11,9 @@ export const registerSchema = Joi.object({
   }),
   firstName: Joi.string().optional().allow(""),
   lastName: Joi.string().optional().allow(""),
+  role: Joi.string().uppercase().required().messages({
+    "any.required": "Role is required",
+  }),
 });
 
 export const loginSchema = Joi.object({
