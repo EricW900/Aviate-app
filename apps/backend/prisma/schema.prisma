@@ -1,0 +1,178 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+    // binaryTargets = ["native", "debian-openssl-1.1.x"]     for c panel
+}
+
+model User {
+    id            String       @id @default(cuid())
+    email         String       @unique
+    password      String
+    firstName     String?
+    lastName      String?
+    role          role_type    @default(SYSTEM_USER)
+    employee_code String       @unique
+    // hireDate DateTime // TODO: Create hire date in API
+    isActive      Boolean      @default(true)
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    flightCrews   FlightCrew[]
+
+    @@map("users")
+}
+
+// ENUMERATORS FOR ROLE TYPES
+enum role_type {
+    ADMIN
+    PILOT
+    FIRST_OFFICER
+    FLIGHT_ENGINEER
+    CABIN_CREW
+    SYSTEM_USER
+}
+
+// AIRCRAFT MANUFACTURERS AND MODELS
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+model Manufacturer {
+    id         String   @id @default(cuid())
+    name       String   @unique
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    active     Boolean  @default(true)
+
+    models AircraftModel[]
+}
+
+model AircraftModel {
+    id             String       @id @default(cuid())
+    name           String
+    manufacturerId String
+    manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+
+    aircrafts Aircraft[]
+
+    @@unique([name, manufacturerId])
+}
+
+model Aircraft {
+    id       String         @id @default(cuid())
+    prefix   String         @unique
+    modelId  String
+    model    AircraftModel  @relation(fields: [modelId], references: [id])
+    capacity Int
+    rangeKm  Int
+    status   AircraftStatus
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    flights   Flight[]
+}
+
+enum AircraftStatus {
+    ACTIVE
+    MAINTENANCE
+    INACTIVE
+    GROUNDED
+    ORDERED
+    DEACTIVATED
+}
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+// ROUTES AND AIRPORT MODELS
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+model Airport {
+    id       String @id @default(cuid())
+    name     String
+    iataCode String @unique
+    icaoCode String @unique
+    city     String
+    country  String
+
+    origins      Route[] @relation("Origin")
+    destinations Route[] @relation("Destination")
+}
+
+model Route {
+    id            String @id @default(cuid())
+    originId      String
+    destinationId String
+
+    origin      Airport @relation("Origin", fields: [originId], references: [id])
+    destination Airport @relation("Destination", fields: [destinationId], references: [id])
+
+    distanceKm    Int
+    estimatedTime Int // minutes
+    flights       Flight[]
+
+    @@unique([originId, destinationId])
+}
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+// FLIGHT AND CREW MODELS
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+enum CrewRole {
+    PILOT
+    FIRST_OFFICER
+    CABIN_CREW
+    FLIGHT_ENGINEER
+}
+
+enum FlightStatus {
+    SCHEDULED
+    BOARDING
+    DEPARTED
+    COMPLETED
+    CANCELLED
+}
+
+model Flight {
+    id String @id @default(cuid())
+
+    flightNumber String
+
+    routeId String
+    route   Route  @relation(fields: [routeId], references: [id])
+
+    aircraftId String
+    aircraft   Aircraft @relation(fields: [aircraftId], references: [id])
+
+    departureTime DateTime
+    arrivalTime   DateTime
+
+    status FlightStatus
+
+    crew FlightCrew[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([flightNumber, departureTime])
+}
+
+model FlightCrew {
+    id String @id @default(cuid())
+
+    flightId String
+    userId   String
+
+    role CrewRole
+
+    flight Flight @relation(fields: [flightId], references: [id])
+    user   User   @relation(fields: [userId], references: [id])
+
+    @@unique([flightId, userId])
+}
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
