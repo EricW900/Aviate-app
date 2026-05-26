@@ -5,6 +5,7 @@ const navItems = [
   { label: "Aircrafts", to: "/dashboard/aircrafts" },
   { label: "Routes", to: "/dashboard/routes" },
   { label: "Users", to: "/dashboard/user"},
+  { label: "Airports", to: "/dashboard/airports"},
 ];
 
 const Sidebar = () => {

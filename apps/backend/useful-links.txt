@@ -1,9 +1,6 @@
 https://github.com/Deepakcodez/node-express-ts-prisma-biolerplate
 https://github.com/Deepakcodez/node-express-ts-prisma-biolerplate/blob/master/docs/ARCHITECTURE.md
 
-login (user): admin
-password: admin
-
 https://ui.shadcn.com/
 https://shadcntemplates.com/theme/dotnize-react-tanstarter
 
