@@ -261,7 +261,7 @@ const UserSection = () => {
                         <button
                             type="submit"
                             disabled={creating}
-                            className="rounded-xl bg-aviation-blue px-4 py-3 text-white hover:bg-aviation-dark-blue focus:outline-none focus:ring-2 focus:ring-aviation-blue disabled:cursor-not-allowed disabled:opacity-60"
+                            className="rounded-xl bg-aviation-blue px-4 py-3 text-white hover:bg-aviation-dark-blue focus:outline-none focus:ring-2 focus:ring-aviation-blue disabled:cursor-not-allowed disabled:opacity-60 hover:bg-aviation-muted"
                         >
                             {creating ? "Creating..." : "Create"}
                         </button>

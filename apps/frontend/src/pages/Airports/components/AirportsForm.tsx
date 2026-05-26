@@ -93,7 +93,7 @@ const AirportsSection = () => {
                     <div className="col-span-full flex pt-2">
                         <button
                             type="submit"
-                            className="rounded-xl bg-aviation-blue px-5 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                            className="rounded-xl bg-aviation-blue px-5 py-3 text-sm font-medium text-white hover:bg-aviation-muted"
                         >
                             Create Airport
                         </button>
