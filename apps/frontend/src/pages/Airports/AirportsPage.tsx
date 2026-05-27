@@ -1,4 +1,5 @@
 import AirportsSection from "../Airports/components/AirportsForm"
+import AirportsTable from "../Airports/components/AirportsTable";
 
 const AirportsPage = () => {
     return (
@@ -8,6 +9,7 @@ const AirportsPage = () => {
                 <p className="mt-2 text-sm text-slate-500">View and manage airport information.</p>
             </div>
             <AirportsSection />
+            <AirportsTable />
         </div>
     )
 }

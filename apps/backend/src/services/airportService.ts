@@ -1,5 +1,5 @@
 import prisma from "../config/database";
-import { createAirportRequest, editAirportRequest, getAirportRequest } from "../types/airport";
+import { createAirportRequest, editAirportRequest, getAirportRequest, listAirportRequest } from "../types/airport";
 import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
 
 export class airportService {
@@ -30,6 +30,8 @@ export class airportService {
                     country: req.country,
                 }
             });
+
+            return newAirport;
         } catch (error: any) {
             throw new ValidationError("Error cannot create an airport")
         }
@@ -98,6 +100,23 @@ export class airportService {
             throw new ValidationError("Cannot found airport");
         }
     }
+
+    static async list(req: listAirportRequest, user: any) {
+        try {
+            return await prisma.airport.findMany({
+            select: {
+                id: true,
+                name: true,
+                iataCode: true,
+                icaoCode: true,
+                city: true,
+                country: true
+            }
+        });
+        } catch (error) {
+            throw new Error("Cannot list airports");
+        }
+    };
 }
 
 // name: string,

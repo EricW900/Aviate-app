@@ -2,7 +2,7 @@ import { Router } from "express";
 import { validateRequest } from "../middleware/validation";
 import { authenticate } from "../middleware/auth";
 import { airportController } from "../controllers/airportController";
-import { createAirportSchema, editAirportSchema, getAirportSchema } from "../validations/aiportValidation";
+import { createAirportSchema, editAirportSchema, getAirportSchema, listAirportSchema } from "../validations/aiportValidation";
 
 const router = Router();
 
@@ -22,6 +22,12 @@ router.get("/get",
     authenticate,
     validateRequest(getAirportSchema),
     airportController.get,
+)
+
+router.get("/list",
+    authenticate,
+    validateRequest(listAirportSchema),
+    airportController.list,
 )
 
 export default router;

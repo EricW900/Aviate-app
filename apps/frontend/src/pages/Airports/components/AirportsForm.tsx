@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useAlert } from "../../../context/AlertContext";
+import { createAirport } from '../services/AirportsService';
 
 const AirportsSection = () => {
     const { showAlert } = useAlert();
+
+    const [saving, setSaving] = useState(false);
 
     // Seting up state for form fields
     const [airportName, setAirportName] = useState("");
@@ -14,7 +17,29 @@ const AirportsSection = () => {
 
     const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        showAlert("Airport created successfully!", "success");
+
+        try {
+            setSaving(true);
+
+            await createAirport({
+                name: airportName,
+                iataCode: iataCode,
+                icaoCode: icaoCode,
+                city: city,
+                country: country
+            });
+
+             showAlert("Airport created successfully!", "success");
+        } catch (error: any) {
+            const message =
+            error?.response?.data?.message ||
+            error?.response?.data?.error ||
+            "Error creating airport.";
+
+            showAlert(message, "error");
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (

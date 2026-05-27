@@ -20,3 +20,7 @@ export const editAirportSchema = Joi.object({
 export const getAirportSchema = Joi.object({
     icaoCode: Joi.string().uppercase().length(4).pattern(/^[A-Z]{4}$/).required(),
 })
+
+export const listAirportSchema = Joi.object({
+
+})

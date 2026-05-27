@@ -48,4 +48,20 @@ export class airportController {
             next(error);
         }
     }
+
+    static async list(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+        try {
+            const result = await airportService.list(req.body, req.user);
+
+            ApiResponseUtil.success(
+                res,
+                "Airport list successfully",
+                result,
+                201
+            );
+
+        } catch (error) {
+            next(error);
+        }
+    }
 }
