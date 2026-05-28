@@ -1,8 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAlert } from "../../../context/AlertContext";
 import { createAirport } from '../services/AirportsService';
 
-const AirportsSection = () => {
+type AirportsSectionProps = {
+    onAirportCreated: () => void;
+}
+
+const AirportsSection = ({ onAirportCreated }: AirportsSectionProps) => {
     const { showAlert } = useAlert();
 
     const [saving, setSaving] = useState(false);
@@ -13,7 +17,6 @@ const AirportsSection = () => {
     const [icaoCode, setIcaoCode] = useState("");
     const [city, setCity] = useState("");
     const [country, setCountry] = useState("");
-
 
     const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,12 +32,20 @@ const AirportsSection = () => {
                 country: country
             });
 
-             showAlert("Airport created successfully!", "success");
+            showAlert("Airport created successfully!", "success");
+
+            setAirportName("");
+            setIataCode("");
+            setIcaoCode("");
+            setCity("");
+            setCountry("");
+
+            onAirportCreated();
         } catch (error: any) {
             const message =
-            error?.response?.data?.message ||
-            error?.response?.data?.error ||
-            "Error creating airport.";
+                error?.response?.data?.message ||
+                error?.response?.data?.error ||
+                "Error creating airport.";
 
             showAlert(message, "error");
         } finally {
@@ -118,9 +129,10 @@ const AirportsSection = () => {
                     <div className="col-span-full flex pt-2">
                         <button
                             type="submit"
-                            className="rounded-xl bg-aviation-blue px-5 py-3 text-sm font-medium text-white hover:bg-aviation-muted"
+                            disabled={saving}
+                            className="rounded-xl bg-aviation-blue px-5 py-3 text-sm font-medium text-white hover:bg-aviation-muted disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            Create Airport
+                            {saving ? "Creating..." : "Create Airport"}
                         </button>
                     </div>
                 </form>
