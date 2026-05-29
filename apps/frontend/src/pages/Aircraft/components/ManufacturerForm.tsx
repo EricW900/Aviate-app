@@ -8,7 +8,6 @@ import {
 
 import type { Manufacturer } from "../services/aircraftService";
 
-// Try to add console.log(manufacturers) to see the id
 const ManufacturerSection = () => {
   const { showAlert } = useAlert();
 
@@ -16,10 +15,8 @@ const ManufacturerSection = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // create form
   const [newName, setNewName] = useState("");
 
-  // inline edit
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [editingActive, setEditingActive] = useState(true);
