@@ -134,38 +134,65 @@ export class routeService {
     }
 
     static async list(req: listRouteRequest, user: any) {
-        try {
-            return prisma.route.findMany({
-                select: {
-                    id: true,
+        const routes = await prisma.route.findMany({
+            select: {
+                id: true,
 
-                    origin: {
-                        select: {
-                            icaoCode: true,
-                            city: true
-                        }
-                    },
+                distanceKm: true,
+                estimatedTime: true,
 
-                    destination: {
-                        select: {
-                            icaoCode: true,
-                            city: true
-                        }
+                origin: {
+                    select: {
+                        name: true,
+                        city: true,
+                        iataCode: true,
+                        icaoCode: true,
                     }
                 },
 
-                orderBy: {
+                destination: {
+                    select: {
+                        name: true,
+                        city: true,
+                        iataCode: true,
+                        icaoCode: true,
+                    }
+                }
+            },
+
+            orderBy: [
+                {
                     origin: {
                         city: "asc"
                     }
+                },
+                {
+                    destination: {
+                        city: "asc"
+                    }
                 }
-            });
-        } catch (error: any) {
-            if (error.code === 'P2025') {
-                throw new NotFoundError("Route to find not found");
-            }
+            ]
+        });
 
-            throw new NotFoundError("Cannot find routes");
-        }
+        return routes.map(route => ({
+            id: route.id,
+
+            distanceKm: route.distanceKm,
+            estimatedTime: route.estimatedTime,
+
+            origin: {
+                name: route.origin.name,
+                city: route.origin.city,
+                iata: route.origin.iataCode,
+                icao: route.origin.icaoCode,
+            },
+
+            destination: {
+                name: route.destination.name,
+                city: route.destination.city,
+                iata: route.destination.iataCode,
+                icao: route.destination.icaoCode,
+            },
+        }));
     }
 }

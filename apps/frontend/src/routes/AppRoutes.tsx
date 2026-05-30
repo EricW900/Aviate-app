@@ -9,6 +9,7 @@ import AirportsPage from "../pages/Airports/AirportsPage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../layout/DashboardLayout";
+import RoutesPage from "../pages/Routes/routesPage";
 
 const AppRoutes = () => {
     return (
@@ -24,6 +25,7 @@ const AppRoutes = () => {
                         <Route path="/dashboard/aircrafts" element={<AircraftPage />} />
                         <Route path="/dashboard/user" element={<UserPage />} />
                         <Route path="/dashboard/airports" element={<AirportsPage />} />
+                        <Route path="/dashboard/routes" element={<RoutesPage />} />
                     </Route>
                 </Route>
             </Routes>
