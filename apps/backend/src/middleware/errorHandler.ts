@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/errors";
 import { ApiResponseUtil } from "../utils/apiResponse";
+import { Prisma } from "@prisma/client";
 
 export const errorHandler = (
   error: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   if (error instanceof AppError) {
     ApiResponseUtil.error(res, error.message, undefined, error.statusCode);
@@ -14,10 +15,14 @@ export const errorHandler = (
   }
 
   // Handle Prisma errors
-  if (error.name === "PrismaClientKnownRequestError") {
-    const prismaError = error as any;
-    if (prismaError.code === "P2002") {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === "P2002") {
       ApiResponseUtil.conflict(res, "Resource already exists");
+      return;
+    }
+
+    if (error.code === "P2025") {
+      ApiResponseUtil.notFound(res, "Resource not found");
       return;
     }
   }

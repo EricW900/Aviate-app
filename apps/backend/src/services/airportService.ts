@@ -1,43 +1,34 @@
 import prisma from "../config/database";
-import { createAirportRequest, editAirportRequest, getAirportRequest, listAirportRequest } from "../types/airport";
-import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
+import { createAirportRequest, editAirportRequest, getAirportRequest } from "../types/airport";
+import { ConflictError, NotFoundError } from "../utils/errors";
 
 export class airportService {
-    static async create(req: createAirportRequest, user: any) {
-        const iataExists = await prisma.airport.findFirst({
+    static async create(req: createAirportRequest) {
+        const airportExists = await prisma.airport.findFirst({
             where: {
-                iataCode: req.iataCode,
+                OR: [
+                    { iataCode: req.iataCode },
+                    { icaoCode: req.icaoCode },
+                ],
             }
         });
 
-        const icaoExists = await prisma.airport.findFirst({
-            where: {
-                icaoCode: req.icaoCode,
-            }
-        });
-
-        if (iataExists || icaoExists) {
+        if (airportExists) {
             throw new ConflictError("ICAO or IATA code already exists for this airport!")
-        };
-
-        try {
-            const newAirport = await prisma.airport.create({
-                data: {
-                    name: req.name,
-                    iataCode: req.iataCode,
-                    icaoCode: req.icaoCode,
-                    city: req.city,
-                    country: req.country,
-                }
-            });
-
-            return newAirport;
-        } catch (error: any) {
-            throw new ValidationError("Error cannot create an airport")
         }
+
+        return prisma.airport.create({
+            data: {
+                name: req.name,
+                iataCode: req.iataCode,
+                icaoCode: req.icaoCode,
+                city: req.city,
+                country: req.country,
+            }
+        });
     }
 
-    static async edit(req: editAirportRequest, user: any) {
+    static async edit(req: editAirportRequest) {
         const airport = await prisma.airport.findUnique({
             where: {
                 id: req.airportId,
@@ -74,73 +65,51 @@ export class airportService {
             throw new ConflictError("ICAO code already exists for another airport!");
         }
 
-        try {
-            return await prisma.airport.update({
-                where: {
-                    id: req.airportId,
-                },
-                data: {
-                    name: req.name,
-                    iataCode: req.iataCode,
-                    icaoCode: req.icaoCode,
-                    city: req.city,
-                    country: req.country,
-                },
-            });
-        } catch (error) {
-            throw new ValidationError("Cannot edit airport");
-        }
+        return prisma.airport.update({
+            where: {
+                id: req.airportId,
+            },
+            data: {
+                name: req.name,
+                iataCode: req.iataCode,
+                icaoCode: req.icaoCode,
+                city: req.city,
+                country: req.country,
+            },
+        });
     }
 
-    static async get(req: getAirportRequest, user: any) {
-        const icaoExists = await prisma.airport.findUnique({
+    static async get(req: getAirportRequest) {
+        const airport = await prisma.airport.findUnique({
             where: {
                 icaoCode: req.icaoCode,
+            },
+            select: {
+                name: true,
+                iataCode: true,
+                icaoCode: true,
+                city: true,
+                country: true
             }
         });
 
-        if (!icaoExists) {
+        if (!airport) {
             throw new NotFoundError("Airport not found");
         }
 
-        try {
-            return await prisma.airport.findUnique({
-                where: {
-                    icaoCode: req.icaoCode,
-                },
-                select: {
-                    name: true,
-                    iataCode: true,
-                    icaoCode: true,
-                    city: true,
-                    country: true
-                }
-            })
-        } catch (error) {
-            throw new ValidationError("Cannot found airport");
-        }
+        return airport;
     }
 
-    static async list(req: listAirportRequest, user: any) {
-        try {
-            return await prisma.airport.findMany({
-                select: {
-                    id: true,
-                    name: true,
-                    iataCode: true,
-                    icaoCode: true,
-                    city: true,
-                    country: true
-                }
-            });
-        } catch (error) {
-            throw new Error("Cannot list airports");
-        }
-    };
+    static async list() {
+        return prisma.airport.findMany({
+            select: {
+                id: true,
+                name: true,
+                iataCode: true,
+                icaoCode: true,
+                city: true,
+                country: true
+            }
+        });
+    }
 }
-
-// name: string,
-// iataCode: string,
-// icaoCode: string,
-// city: string,
-// country: string,

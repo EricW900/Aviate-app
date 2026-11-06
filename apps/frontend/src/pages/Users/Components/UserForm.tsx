@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAlert } from "../../../context/AlertContext";
 import { createUser, editUser, listUsers, type User } from "../Services/UserService";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 const UserSection = () => {
     const { showAlert } = useAlert();
@@ -23,7 +24,7 @@ const UserSection = () => {
     const [editingEmail, setEditingEmail] = useState("");
     const [editingRole, setEditingRole] = useState("");
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         try {
             setLoading(true);
 
@@ -43,11 +44,11 @@ const UserSection = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [showAlert]);
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [loadData]);
 
     const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -92,11 +93,8 @@ const UserSection = () => {
             setRole("");
 
             await loadData();
-        } catch (error: any) {
-            showAlert(
-                error?.response?.data?.message || "Failed to create user",
-                "error"
-            );
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Failed to create user"), "error");
         } finally {
             setCreating(false);
         }
@@ -158,11 +156,8 @@ const UserSection = () => {
             showAlert("User updated successfully", "success");
             cancelEdit();
             await loadData();
-        } catch (error: any) {
-            showAlert(
-                error?.response?.data?.message || "Failed to update user",
-                "error"
-            );
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Failed to update user"), "error");
         } finally {
             setSaving(false);
         }

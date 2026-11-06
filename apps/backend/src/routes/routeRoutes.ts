@@ -1,32 +1,33 @@
 import { Router } from "express";
 import { validateRequest } from "../middleware/validation";
-import { authenticate } from "../middleware/auth";
-import { createRouteSchema, editRouteSchema, getRouteSchema, listRouteSchema } from "../validations/routeValidation";
+import { authenticate, authorize } from "../middleware/auth";
+import { createRouteSchema, editRouteSchema, getRouteSchema } from "../validations/routeValidation";
 import { routeController } from "../controllers/routeController";
 
 const router = Router();
 
 router.post("/create",
     authenticate,
+    authorize("ADMIN"),
     validateRequest(createRouteSchema),
     routeController.create,
 )
 
-router.post("/edit",
+router.patch("/edit",
     authenticate,
+    authorize("ADMIN"),
     validateRequest(editRouteSchema),
     routeController.edit,
 )
 
-router.get("/get",
+router.get("/get/:routeId",
     authenticate,
-    validateRequest(getRouteSchema),
+    validateRequest(getRouteSchema, "params"),
     routeController.get,
 )
 
 router.get("/list",
     authenticate,
-    validateRequest(listRouteSchema),
     routeController.list,
 )
 

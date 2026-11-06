@@ -3,27 +3,17 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import dotenv from "dotenv";
 import routes from "./routes";
 import { errorHandler } from "./middleware/errorHandler";
 import { ApiResponseUtil } from "./utils/apiResponse";
 
-// Load environment variables
-dotenv.config();
-
 const app = express();
-
-app.use((req, res, next) => {
-  console.log("REQ RECEBIDA:", req.method, req.url);
-  next();
-});
 
 // Security middleware
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*",
-    credentials: true,
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   })
 );
 
@@ -31,10 +21,13 @@ app.use(
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    success: false,
-    message: "Too many requests from this IP, please try again later.",
-    timestamp: new Date().toISOString(),
+  handler: (_req, res) => {
+    ApiResponseUtil.error(
+      res,
+      "Too many requests from this IP, please try again later.",
+      undefined,
+      429
+    );
   },
 });
 app.use(limiter);

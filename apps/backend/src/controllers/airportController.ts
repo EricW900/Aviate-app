@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, response } from "express";
+import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "../middleware/auth";
 import { ApiResponseUtil } from "../utils/apiResponse";
 import { airportService } from "../services/airportService";
@@ -6,7 +6,7 @@ import { airportService } from "../services/airportService";
 export class airportController {
     static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await airportService.create(req.body, req.user);
+            const result = await airportService.create(req.body);
 
             ApiResponseUtil.success(
                 res,
@@ -21,13 +21,12 @@ export class airportController {
 
     static async edit(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await airportService.edit(req.body, req.user);
+            const result = await airportService.edit(req.body);
 
             ApiResponseUtil.success(
                 res,
                 "Airport edited successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -36,13 +35,12 @@ export class airportController {
 
     static async get(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await airportService.get(req.body, req.user);
+            const result = await airportService.get({ icaoCode: req.params.icaoCode });
 
             ApiResponseUtil.success(
                 res,
                 "Airport get successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -51,13 +49,12 @@ export class airportController {
 
     static async list(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await airportService.list(req.body, req.user);
+            const result = await airportService.list();
 
             ApiResponseUtil.success(
                 res,
                 "Airport list successfully",
-                result,
-                201
+                result
             );
 
         } catch (error) {

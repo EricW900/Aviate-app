@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAlert } from "../../../context/AlertContext";
 
 import {
-    listRoutes
+    listRoutes,
+    type Route,
 } from "../services/routesService";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 type RoutesTableProps = {
     refreshKey: number;
@@ -15,28 +17,23 @@ const RoutesTable = ({ refreshKey }: RoutesTableProps) => {
     const [routes, setRoutes] = useState<Route[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const loadRoutes = async () => {
+    const loadRoutes = useCallback(async () => {
         try {
             setLoading(true);
 
             const response = await listRoutes();
 
             setRoutes(response.data.data);
-        } catch (error: any) {
-            const message =
-                error?.response?.data?.message ||
-                error?.response?.data?.error ||
-                "Error loading routes.";
-
-            showAlert(message, "error");
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Error loading routes."), "error");
         } finally {
             setLoading(false);
         }
-    };
+    }, [showAlert]);
 
     useEffect(() => {
         loadRoutes();
-    }, [refreshKey]);
+    }, [loadRoutes, refreshKey]);
 
     return (
         <div className="space-y-6">

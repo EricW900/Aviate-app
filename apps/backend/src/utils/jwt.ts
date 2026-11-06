@@ -10,12 +10,12 @@ export class JwtUtil {
     return secret;
   }
 
-  private static getExpiresIn() {
-    return process.env.JWT_EXPIRES_IN || "7d";
+  private static getExpiresIn(): SignOptions["expiresIn"] {
+    return (process.env.JWT_EXPIRES_IN || "7d") as SignOptions["expiresIn"];
   }
 
   static generateToken(payload: AuthTokenPayload): string {
-    const options: SignOptions = { expiresIn: this.getExpiresIn() as string | any };
+    const options: SignOptions = { expiresIn: this.getExpiresIn() };
     return jwt.sign(payload, this.getSecret(), options);
   }
 

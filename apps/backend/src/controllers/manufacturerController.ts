@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "../middleware/auth";
 import { manufacturerService } from "../services/manufacturerService";
 import { ApiResponseUtil } from "../utils/apiResponse";
@@ -6,7 +6,7 @@ import { ApiResponseUtil } from "../utils/apiResponse";
 export class manufacturerController {
     static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await manufacturerService.create(req.body, req.user);
+            const result = await manufacturerService.create(req.body);
 
             ApiResponseUtil.success(
                 res,
@@ -21,13 +21,12 @@ export class manufacturerController {
 
     static async edit(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await manufacturerService.edit(req.body, req.user);
+            const result = await manufacturerService.edit(req.body);
 
             ApiResponseUtil.success(
                 res,
                 "Manufacturer edited successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -36,13 +35,12 @@ export class manufacturerController {
 
     static async list(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await manufacturerService.list(req.body, req.user);
+            const result = await manufacturerService.list();
 
             ApiResponseUtil.success(
                 res,
                 "Manufacturer list found successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);

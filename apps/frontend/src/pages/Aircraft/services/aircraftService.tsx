@@ -1,4 +1,5 @@
 import api from "../../../api/axios";
+import type { ApiResponse } from "../../../types/api";
 
 export interface Manufacturer {
     id: string;
@@ -16,12 +17,20 @@ export interface EditManufacturerRequest {
     active: boolean;
 };
 
+export type AircraftStatus =
+    | "ACTIVE"
+    | "MAINTENANCE"
+    | "INACTIVE"
+    | "GROUNDED"
+    | "ORDERED"
+    | "DEACTIVATED";
+
 export interface Aircraft {
     id: string;
     prefix: string;
     capacity: number;
     rangeKm: number;
-    status: "ACTIVE" | "DEACTIVATED";
+    status: AircraftStatus;
     modelId: string;
 
     model?: {
@@ -51,41 +60,41 @@ export interface EditAircraftRequest {
     modelId: string;
     capacity: number;
     rangeKm: number;
-    status: "ACTIVE" | "DEACTIVATED";
+    status: AircraftStatus;
 }
 
 export const listManufacturers = async () => {
-    return api.get("/manufacturer/list");
+    return api.get<ApiResponse<Manufacturer[]>>("/manufacturer/list");
 };
 
 export const createManufacturer = async (
     payload: CreateManufacturerRequest
 ) => {
-    return api.post("/manufacturer/create", payload);
+    return api.post<ApiResponse<Manufacturer>>("/manufacturer/create", payload);
 };
 
 export const editManufacturer = async (
     payload: EditManufacturerRequest
 ) => {
-    return api.post("/manufacturer/edit", payload);
+  return api.patch<ApiResponse<Manufacturer>>("/manufacturer/edit", payload);
 };
 
 export const listAircraft = async () => {
-  return api.get("/aircraft/list");
+  return api.get<ApiResponse<Aircraft[]>>("/aircraft/list");
 };
 
 export const createAircraft = async (
   payload: CreateAircraftRequest
 ) => {
-  return api.post("/aircraft/create", payload);
+  return api.post<ApiResponse<Aircraft>>("/aircraft/create", payload);
 };
 
 export const editAircraft = async (
   payload: EditAircraftRequest
 ) => {
-  return api.post("/aircraft/edit", payload);
+  return api.patch<ApiResponse<Aircraft>>("/aircraft/edit", payload);
 };
 
 export const listAircraftModels = async () => {
-  return api.get("/aircraftModel/list");
+  return api.get<ApiResponse<AircraftModel[]>>("/aircraftModel/list");
 };

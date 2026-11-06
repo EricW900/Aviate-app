@@ -1,13 +1,9 @@
 import prisma from "../config/database";
-import { createAircraftRequest, editAircraftRequest, getAircraftRequest, listAircraftRequest } from "../types/aircraft";
-import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
+import { createAircraftRequest, editAircraftRequest, getAircraftRequest } from "../types/aircraft";
+import { ConflictError, NotFoundError } from "../utils/errors";
 
 export class AircraftService {
-    static async create(data: createAircraftRequest, user: any) {
-        // if (!user.isActive) {
-        //     throw new ValidationError("Inactive user cannot create aircraft");
-        // }
-
+    static async create(data: createAircraftRequest) {
         const model = await prisma.aircraftModel.findUnique({
             where: { id: data.modelId },
         });
@@ -38,11 +34,7 @@ export class AircraftService {
         return aircraft;
     }
 
-    static async edit(data: editAircraftRequest, user: any) {
-        if (!user.isActive) {
-            throw new ValidationError("Inactive user cannot edit aircraft");
-        }
-
+    static async edit(data: editAircraftRequest) {
         if (!data.aircraftId) {
             throw new NotFoundError("Aircraft Id not sent!");
         }
@@ -81,7 +73,7 @@ export class AircraftService {
         return editedAircraft;
     }
 
-    static async bulkGet(data: getAircraftRequest, user: any) {
+    static async bulkGet(data: getAircraftRequest) {
         const aircrafts = await prisma.aircraft.findMany({
             where: {
                 id: {
@@ -97,9 +89,8 @@ export class AircraftService {
         return aircrafts;
     }
 
-    static async list(data: listAircraftRequest, user: any) {
-        try {
-            return prisma.aircraft.findMany({
+    static async list() {
+        return prisma.aircraft.findMany({
                 select: {
                     id: true,
                     prefix: true,
@@ -120,15 +111,6 @@ export class AircraftService {
                         }
                     }
                 }
-            });
-        } catch (error) {
-            throw new NotFoundError("Aircraft list not found");
-        }
+        });
     }
 }
-
-// aircraftId: string;
-// prefix: string;
-// modelId: string;
-// capacity: number;
-// rangeKm: number

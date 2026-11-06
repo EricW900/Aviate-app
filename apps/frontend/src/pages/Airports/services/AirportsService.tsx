@@ -1,4 +1,5 @@
 import api from "../../../api/axios";
+import type { ApiResponse } from "../../../types/api";
 
 export interface Airport {
     id: string;
@@ -28,13 +29,13 @@ export interface EditAirportRequest {
 
 // Routes
 export const createAirport = async (payload: CreateAirportRequest) => {
-    return api.post("/airport/create", payload);
+    return api.post<ApiResponse<Airport>>("/airport/create", payload);
 }
 
 export const editAirport = async (payload: EditAirportRequest) => {
-    return api.post("/airport/edit", payload);
+    return api.patch<ApiResponse<Airport>>("/airport/edit", payload);
 }
 
 export const listAirports = async () => {
-    return api.get("/airport/list");
+    return api.get<ApiResponse<Airport[]>>("/airport/list");
 }

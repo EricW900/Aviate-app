@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, response } from "express";
+import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "../middleware/auth";
 import { ApiResponseUtil } from "../utils/apiResponse";
 import { flightService } from "../services/flightService";
@@ -6,7 +6,7 @@ import { flightService } from "../services/flightService";
 export class flightController {
     static async create(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await flightService.create(req.body, req.user);
+            const result = await flightService.create(req.body);
 
             ApiResponseUtil.success(
                 res,
@@ -21,13 +21,12 @@ export class flightController {
 
     static async get(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await flightService.get(req.body, req.user);
+            const result = await flightService.get({ flightId: req.params.flightId });
 
             ApiResponseUtil.success(
                 res,
                 "Flight getted successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -36,14 +35,12 @@ export class flightController {
 
     static async bulkGet(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const flightsIds = req.body;
-            const result = await flightService.bulkGet(flightsIds, req.user);
+            const result = await flightService.bulkGet(req.body);
 
             ApiResponseUtil.success(
                 res,
                 "Flights getted successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -52,13 +49,12 @@ export class flightController {
 
     static async flights(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await flightService.flights(req.body, req.user);
+            const result = await flightService.flights();
 
             ApiResponseUtil.success(
                 res,
                 "All flights getted successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -67,13 +63,12 @@ export class flightController {
 
     static async edit(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await flightService.edit(req.body, req.user);
+            const result = await flightService.edit(req.body);
 
             ApiResponseUtil.success(
                 res,
                 "Flight edited successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -82,7 +77,7 @@ export class flightController {
 
     static async createCrew(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await flightService.createCrew(req.body, req.user);
+            const result = await flightService.createCrew(req.body);
 
             ApiResponseUtil.success(
                 res,
@@ -97,13 +92,12 @@ export class flightController {
 
     static async getCrew(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await flightService.getCrew(req.body, req.user);
+            const result = await flightService.getCrew({ flightId: req.params.flightId });
 
             ApiResponseUtil.success(
                 res,
                 "Crew getted successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);
@@ -112,13 +106,12 @@ export class flightController {
 
     static async editCrew(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
-            const result = await flightService.editCrew(req.body, req.user);
+            const result = await flightService.editCrew(req.body);
 
             ApiResponseUtil.success(
                 res,
                 "Crew edited successfully",
-                result,
-                201
+                result
             );
         } catch (error) {
             next(error);

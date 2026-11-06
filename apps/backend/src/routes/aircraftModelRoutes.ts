@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { aircraftModelController } from "../controllers/aircraftModelController";
 import { validateRequest } from "../middleware/validation";
-import { authenticate } from "../middleware/auth";
-import { createAircraftModelSchema, editAircraftModelSchema, getAircraftModelSchema, listAircraftModelSchema } from "../validations/aircraftModelValidation";
+import { authenticate, authorize } from "../middleware/auth";
+import { createAircraftModelSchema, editAircraftModelSchema, getAircraftModelSchema } from "../validations/aircraftModelValidation";
 
 const router = Router();
 
 router.post("/create",
     authenticate,
+    authorize("ADMIN"),
     validateRequest(createAircraftModelSchema),
     aircraftModelController.create,
 )
@@ -20,12 +21,12 @@ router.post("/get",
 
 router.get("/list",
     authenticate,
-    validateRequest(listAircraftModelSchema),
     aircraftModelController.list
 )
 
-router.post("/edit",
+router.patch("/edit",
     authenticate,
+    authorize("ADMIN"),
     validateRequest(editAircraftModelSchema),
     aircraftModelController.edit,
 )

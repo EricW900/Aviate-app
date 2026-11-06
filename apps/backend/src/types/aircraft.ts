@@ -19,12 +19,3 @@ export interface editAircraftRequest {
 export interface getAircraftRequest {
     aircraftIds: string[];
 }
-
-export interface listAircraftRequest {
-
-}
-
-// // Not necessary in this case because there's no delete, only status "DEACTIVATED"
-// export interface deleteAircraftRequest {
-//     aircraftId: string;
-// }

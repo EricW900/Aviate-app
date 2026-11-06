@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { useAlert } from "../../../context/AlertContext";
 
 import {
@@ -10,6 +11,8 @@ import {
 
 import type { Aircraft } from "../services/aircraftService";
 import type { AircraftModel } from "../services/aircraftService";
+import type { AircraftStatus } from "../services/aircraftService";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 const AircraftSection = () => {
   const { showAlert } = useAlert();
@@ -33,11 +36,9 @@ const AircraftSection = () => {
   const [editingModelId, setEditingModelId] = useState("");
   const [editingCapacity, setEditingCapacity] = useState("");
   const [editingRangeKm, setEditingRangeKm] = useState("");
-  const [editingStatus, setEditingStatus] = useState<
-    "ACTIVE" | "DEACTIVATED"
-  >("ACTIVE");
+  const [editingStatus, setEditingStatus] = useState<AircraftStatus>("ACTIVE");
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -47,41 +48,18 @@ const AircraftSection = () => {
           listAircraftModels(),
         ]);
 
-      const aircraftData =
-        aircraftResponse.data?.data ??
-        aircraftResponse.data ??
-        [];
-
-      const modelData =
-        modelResponse.data?.data ??
-        modelResponse.data ??
-        [];
-
-      setAircraft(
-        Array.isArray(aircraftData)
-          ? aircraftData
-          : []
-      );
-
-      setModels(
-        Array.isArray(modelData)
-          ? modelData
-          : []
-      );
-    } catch (error: any) {
-      showAlert(
-        error?.response?.data?.message ||
-          "Failed to load aircraft",
-        "error"
-      );
+      setAircraft(aircraftResponse.data.data);
+      setModels(modelResponse.data.data);
+    } catch (error: unknown) {
+      showAlert(getErrorMessage(error, "Failed to load aircraft"), "error");
     } finally {
       setLoading(false);
     }
-  };
+  }, [showAlert]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
@@ -107,12 +85,8 @@ const AircraftSection = () => {
       setRangeKm("");
 
       await loadData();
-    } catch (error: any) {
-      showAlert(
-        error?.response?.data?.message ||
-          "Could not create aircraft",
-        "error"
-      );
+    } catch (error: unknown) {
+      showAlert(getErrorMessage(error, "Could not create aircraft"), "error");
     } finally {
       setSaving(false);
     }
@@ -169,12 +143,8 @@ const AircraftSection = () => {
       cancelEdit();
 
       await loadData();
-    } catch (error: any) {
-      showAlert(
-        error?.response?.data?.message ||
-          "Could not update aircraft",
-        "error"
-      );
+    } catch (error: unknown) {
+      showAlert(getErrorMessage(error, "Could not update aircraft"), "error");
     } finally {
       setSaving(false);
     }

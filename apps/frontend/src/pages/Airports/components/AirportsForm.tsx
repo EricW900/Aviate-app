@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAlert } from "../../../context/AlertContext";
 import { createAirport } from '../services/AirportsService';
+import { getErrorMessage } from '../../../utils/getErrorMessage';
 
 type AirportsSectionProps = {
     onAirportCreated: () => void;
@@ -41,13 +42,8 @@ const AirportsSection = ({ onAirportCreated }: AirportsSectionProps) => {
             setCountry("");
 
             onAirportCreated();
-        } catch (error: any) {
-            const message =
-                error?.response?.data?.message ||
-                error?.response?.data?.error ||
-                "Error creating airport.";
-
-            showAlert(message, "error");
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Error creating airport."), "error");
         } finally {
             setSaving(false);
         }

@@ -138,27 +138,27 @@ Error → Service/Controller → Error Middleware → Formatted Error Response
 
 ## Design Patterns
 
-### 1. Dependency Injection
+### 1. Direct Dependencies
 
-- Services are injected into controllers
-- Database client is injected into services
-- Promotes testability and loose coupling
+- Controllers import the services they use
+- Services share one Prisma client instance
+- This keeps the application simple while it remains small
 
-### 2. Factory Pattern
+### 2. Utility Classes
 
-- Error classes use factory methods
-- JWT utility provides factory methods for token operations
+- Custom errors carry HTTP status codes
+- JWT and response utilities centralize repeated operations
 
 ### 3. Middleware Pattern
 
 - Express middleware for cross-cutting concerns
 - Composable and reusable middleware functions
 
-### 4. Repository Pattern (via Prisma)
+### 4. Prisma Data Access
 
-- Database operations abstracted through Prisma client
+- Services query Prisma directly without an extra repository layer
 - Type-safe database queries
-- Automatic query generation
+- One shared client manages database connections
 
 ## Security Architecture
 
@@ -166,12 +166,12 @@ Error → Service/Controller → Error Middleware → Formatted Error Response
 
 - JWT-based stateless authentication
 - Secure token generation with configurable expiration
-- Token verification middleware for protected routes
+- Token verification and active-user checks for protected routes
 
 ### 2. Authorization
 
-- Role-based access control ready (extensible)
-- Route-level protection through middleware
+- Role-based access control through route middleware
+- Administrative mutations are restricted to the `ADMIN` role
 
 ### 3. Data Protection
 
@@ -193,33 +193,32 @@ Error → Service/Controller → Error Middleware → Formatted Error Response
 - JWT tokens eliminate server-side session storage
 - Database connection pooling through Prisma
 
-### 2. Caching Strategy
+### 2. Caching
 
-- Ready for Redis integration
-- JWT tokens reduce database lookups
-- Prisma query optimization
+- No cache layer is currently used
+- Add caching only after measuring a real performance need
 
 ### 3. Monitoring & Logging
 
 - Structured logging with Morgan
-- Error tracking and reporting
+- Unexpected errors are logged to the process output
 - Health check endpoints for monitoring
 
 ## Testing Strategy
 
-### 1. Unit Tests
+### 1. Current Tests
 
-- Service layer business logic
-- Utility functions
-- Middleware functions
+- Request validation contracts
+- Public registration role restrictions
+- Bulk request payload consistency
 
-### 2. Integration Tests
+### 2. Next Integration Tests
 
 - API endpoint testing
 - Database operations
 - Authentication flows
 
-### 3. End-to-End Tests
+### 3. Future End-to-End Tests
 
 - Complete user workflows
 - Error scenarios

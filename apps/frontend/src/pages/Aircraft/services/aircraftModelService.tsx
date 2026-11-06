@@ -1,4 +1,5 @@
 import api from "../../../api/axios";
+import type { ApiResponse } from "../../../types/api";
 
 export interface Manufacturer {
     id: string;
@@ -25,22 +26,22 @@ export interface EditAircraftModelRequest {
 }
 
 export const listManufacturers = async() => {
-    return api.get("/manufacturer/list");
+    return api.get<ApiResponse<Manufacturer[]>>("/manufacturer/list");
 }
 
 export const listAircraftModels = async () => {
-    return api.get("/aircraftModel/list");
+    return api.get<ApiResponse<AircraftModel[]>>("/aircraftModel/list");
 }
 
 export const createAircraftModel = async (
     payload: CreateAircraftModelRequest
 ) => {
-    return api.post("/aircraftModel/create", payload);
+    return api.post<ApiResponse<AircraftModel>>("/aircraftModel/create", payload);
 }
 
 export const editAircraftModel = async (
     payload: EditAircraftModelRequest
 ) => {
-    return api.post("/aircraftModel/edit", payload);
+    return api.patch<ApiResponse<AircraftModel>>("/aircraftModel/edit", payload);
 }
 

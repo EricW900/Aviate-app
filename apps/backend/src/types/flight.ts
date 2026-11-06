@@ -14,11 +14,7 @@ export interface getFlightRequest {
 }
 
 export interface bulkGetFlightRequest {
-    flightId: string[],
-}
-
-export interface flightsRequest{
-
+    flightIds: string[],
 }
 
 export interface editFlightRequest {

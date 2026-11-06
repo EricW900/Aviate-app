@@ -16,7 +16,3 @@ export interface editRouteRequest {
 export interface getRouteRequest {
     routeId: string,
 }
-
-export interface listRouteRequest {
-
-}

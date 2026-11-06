@@ -1,14 +1,15 @@
 import prisma from "../config/database";
-import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
-import { createAircraftModelRequest, editAircraftModelRequest, getAircraftModelRequest, listAircraftModelRequest } from "../types/aircraftModel";
+import { ConflictError, NotFoundError } from "../utils/errors";
+import { createAircraftModelRequest, editAircraftModelRequest, getAircraftModelRequest } from "../types/aircraftModel";
 
 export class aircraftModelService {
-    static async create(req: createAircraftModelRequest, user: any) {
-        req.name = req.name.toUpperCase();
+    static async create(req: createAircraftModelRequest) {
+        const name = req.name.toUpperCase();
 
         const existing = await prisma.aircraftModel.findFirst({
             where: {
-                name: req.name,
+                name,
+                manufacturerId: req.manufacturerId,
             }
         });
 
@@ -28,7 +29,7 @@ export class aircraftModelService {
 
         const aircraftModel = await prisma.aircraftModel.create({
             data: {
-                name: req.name,
+                name,
                 manufacturerId: req.manufacturerId,
             }
         });
@@ -36,39 +37,36 @@ export class aircraftModelService {
         return aircraftModel;
     }
 
-    static async bulkGet(req: getAircraftModelRequest, user: any) {
+    static async bulkGet(req: getAircraftModelRequest) {
         const aircraft = await prisma.aircraftModel.findMany({
             where: {
                 id: {
-                    in: req.aircraftId,
+                    in: req.aircraftModelIds,
                 }
             }
         });
 
-        if (aircraft.length !== req.aircraftId.length) {
+        if (aircraft.length !== req.aircraftModelIds.length) {
             throw new NotFoundError("One or more aircraft models not found");
         }
 
         return aircraft;
     }
 
-    static async list(req: listAircraftModelRequest, user: any) {
+    static async list() {
         const aircraftsModelsList = await prisma.aircraftModel.findMany({
             select: {
                 id: true,
                 name: true,
+                manufacturerId: true,
                 manufacturer: true,
             }
         });
 
-        if (aircraftsModelsList.length == 0) {
-            throw new NotFoundError("One or more aicraft models not found");
-        }
-
         return aircraftsModelsList;
     }
 
-    static async edit(req: editAircraftModelRequest, user: any) {
+    static async edit(req: editAircraftModelRequest) {
         const aircraftModelExists = await prisma.aircraftModel.findFirst({
             where: {
                 id: req.aircraftModelId

@@ -1,6 +1,6 @@
 import { role_type } from "@prisma/client";
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
@@ -19,7 +19,6 @@ export interface RegisterRequest {
   firstName?: string;
   lastName?: string;
   role?: role_type;
-  // employee_code: string;
 }
 
 export interface LoginRequest {
@@ -33,7 +32,7 @@ export interface AuthResponse {
     email: string;
     firstName?: string;
     lastName?: string;
-    role?: role_type;
+    role: role_type;
     employee_code: string;
   };
   token: string;
@@ -45,8 +44,4 @@ export interface EditUserRequest {
     lastName?: string;
     role?: role_type;
 }
-
-// export interface ListUsersRequest {
-
-// }
 

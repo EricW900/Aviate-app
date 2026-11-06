@@ -17,7 +17,7 @@ const AirportsPage = () => {
                 <p className="mt-2 text-sm text-slate-500">View and manage airport information.</p>
             </div>
             <AirportsSection onAirportCreated={refreshAirports} />
-            <AirportsTable key={refreshKey} />
+            <AirportsTable refreshKey={refreshKey} />
         </div>
     )
 }

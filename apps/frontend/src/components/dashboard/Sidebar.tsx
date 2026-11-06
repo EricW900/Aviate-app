@@ -1,7 +1,11 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-const navItems = [
+const commonItems = [
   { label: "Dashboard", to: "/dashboard" },
+];
+
+const adminItems = [
   { label: "Aircrafts", to: "/dashboard/aircrafts" },
   { label: "Routes", to: "/dashboard/routes" },
   { label: "Users", to: "/dashboard/user"},
@@ -9,6 +13,11 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const { user } = useAuth();
+  const navItems = user?.role === "ADMIN"
+    ? [...commonItems, ...adminItems]
+    : commonItems;
+
   return (
     <aside className="hidden w-64 flex-col border-r border-aviation-blue/15 bg-aviation-sidebar text-aviation-light md:flex">
       <div className="border-b border-white/10 px-6 py-6">

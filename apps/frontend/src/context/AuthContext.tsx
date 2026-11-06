@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { loginRequest, getProfile } from "../services/authService";
 import type { User } from "../types/auth";
 
@@ -51,8 +52,8 @@ export const AuthProvider = ({ children }: Props) => {
 
                 const response = await getProfile();
 
-                setUser(response.data.data ?? response.data);
-            } catch (error) {
+                setUser(response.data);
+            } catch {
                 logout();
             } finally {
                 setLoading(false);

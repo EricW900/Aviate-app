@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { useAlert } from "../../../context/AlertContext";
 import {
   createManufacturer,
@@ -7,6 +8,7 @@ import {
 } from "../services/aircraftService";
 
 import type { Manufacturer } from "../services/aircraftService";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 const ManufacturerSection = () => {
   const { showAlert } = useAlert();
@@ -21,32 +23,23 @@ const ManufacturerSection = () => {
   const [editingName, setEditingName] = useState("");
   const [editingActive, setEditingActive] = useState(true);
 
-  const loadManufacturers = async () => {
+  const loadManufacturers = useCallback(async () => {
     try {
       setLoading(true);
 
       const response = await listManufacturers();
 
-      const data =
-        response.data?.data ??
-        response.data?.manufacturers ??
-        response.data ??
-        [];
-
-      setManufacturers(Array.isArray(data) ? data : []);
-    } catch (error: any) {
-      showAlert(
-        error?.response?.data?.message || "Failed to load manufacturers",
-        "error"
-      );
+      setManufacturers(response.data.data);
+    } catch (error: unknown) {
+      showAlert(getErrorMessage(error, "Failed to load manufacturers"), "error");
     } finally {
       setLoading(false);
     }
-  };
+  }, [showAlert]);
 
   useEffect(() => {
     loadManufacturers();
-  }, []);
+  }, [loadManufacturers]);
 
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
@@ -64,11 +57,8 @@ const ManufacturerSection = () => {
       showAlert("Manufacturer created successfully", "success");
       setNewName("");
       await loadManufacturers();
-    } catch (error: any) {
-      showAlert(
-        error?.response?.data?.message || "Could not create manufacturer",
-        "error"
-      );
+    } catch (error: unknown) {
+      showAlert(getErrorMessage(error, "Could not create manufacturer"), "error");
     } finally {
       setSaving(false);
     }
@@ -106,11 +96,8 @@ const ManufacturerSection = () => {
       showAlert("Manufacturer updated successfully", "success");
       cancelEdit();
       await loadManufacturers();
-    } catch (error: any) {
-      showAlert(
-        error?.response?.data?.message || "Could not update manufacturer",
-        "error"
-      );
+    } catch (error: unknown) {
+      showAlert(getErrorMessage(error, "Could not update manufacturer"), "error");
     } finally {
       setSaving(false);
     }

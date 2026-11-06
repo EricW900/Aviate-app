@@ -1,4 +1,5 @@
 import api from "../../../api/axios";
+import type { ApiResponse } from "../../../types/api";
 
 export interface User {
     id: string;
@@ -26,13 +27,14 @@ export interface CreateUserRequest {
 }
 
 export const createUser = async (payload: CreateUserRequest) => {
-    return api.post("/auth/register", payload);
+    return api.post<ApiResponse<User>>("/auth/create-user", payload);
 };
 
 export const listUsers = async() => {
-    return api.get("/auth/list-users");
+    return api.get<ApiResponse<User[]>>("/auth/list-users");
 }
 
 export const editUser = async (payload: editUserRequest) => {
-    return api.post("/auth/edit", payload);
+    const { userId, ...data } = payload;
+    return api.patch<ApiResponse<User>>(`/auth/edit/${userId}`, data);
 }

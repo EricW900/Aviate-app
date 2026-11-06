@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAlert } from "../../../context/AlertContext";
 
 import {
@@ -6,6 +6,7 @@ import {
     listAirports,
     type Airport,
 } from "../services/AirportsService";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 type AirportsTableProps = {
     refreshKey: number;
@@ -20,24 +21,19 @@ const AirportsTable = ({ refreshKey }: AirportsTableProps) => {
     const [airportEditing, setAirportEditing] = useState<Airport | null>(null);
     const [saving, setSaving] = useState(false);
 
-    const loadAirports = async () => {
+    const loadAirports = useCallback(async () => {
         try {
             setLoading(true);
 
             const response = await listAirports();
 
             setAirports(response.data.data);
-        } catch (error: any) {
-            const message =
-                error?.response?.data?.message ||
-                error?.response?.data?.error ||
-                "Error loading airports.";
-
-            showAlert(message, "error");
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Error loading airports."), "error");
         } finally {
             setLoading(false);
         }
-    };
+    }, [showAlert]);
 
     const startEdit = (airport: Airport) => {
         setAirportEditing({ ...airport }); // cria uma cópia para evitar mutações diretas no estado original
@@ -75,11 +71,8 @@ const AirportsTable = ({ refreshKey }: AirportsTableProps) => {
 
             cancelEdit();
             await loadAirports();
-        } catch (error: any) {
-            showAlert(
-                error?.response?.data?.message || "Error updating airport.",
-                "error"
-            );
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Error updating airport."), "error");
         } finally {
             setSaving(false);
         }
@@ -87,7 +80,7 @@ const AirportsTable = ({ refreshKey }: AirportsTableProps) => {
 
     useEffect(() => {
         loadAirports();
-    }, [refreshKey]);
+    }, [loadAirports, refreshKey]);
 
     return (
         <div className="space-y-6">

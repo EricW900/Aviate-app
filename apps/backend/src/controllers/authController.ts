@@ -11,8 +11,24 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const result = await AuthService.register(req.body);
+      const result = await AuthService.register({
+        ...req.body,
+        role: "SYSTEM_USER",
+      });
       ApiResponseUtil.success(res, "User registered successfully", result, 201);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createUser(
+    req: Request<{}, {}, RegisterRequest>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const result = await AuthService.register(req.body);
+      ApiResponseUtil.success(res, "User created successfully", result.user, 201);
     } catch (error) {
       next(error);
     }
@@ -50,7 +66,7 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const users = await AuthService.listUsers(req.user?.userId!);
+      const users = await AuthService.listUsers();
 
       ApiResponseUtil.success(res, "User list retrieved successfully", users);
     } catch (error) {
@@ -64,11 +80,9 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { userId, ...data } = req.body;
+      const result = await AuthService.editUser(req.params.userId, req.body);
 
-        const result = await AuthService.editUser(userId, data);
-
-        ApiResponseUtil.success(res, "User updated successfully", result);
+      ApiResponseUtil.success(res, "User updated successfully", result);
     } catch (error) {
       next(error);
     }

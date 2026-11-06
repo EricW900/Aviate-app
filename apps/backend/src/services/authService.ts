@@ -1,5 +1,4 @@
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
 import { RegisterRequest, LoginRequest, AuthResponse, EditUserRequest } from "../types";
 import { JwtUtil } from "../utils/jwt";
 import {
@@ -8,12 +7,11 @@ import {
   NotFoundError,
 } from "../utils/errors";
 import { nanoid } from 'nanoid';
-
-const prisma = new PrismaClient();
+import prisma from "../config/database";
 
 export class AuthService {
   static async register(data: RegisterRequest): Promise<AuthResponse> {
-    const { email, password, firstName, lastName, role} = data;
+    const { email, password, firstName, lastName, role = "SYSTEM_USER" } = data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -71,11 +69,11 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundError("User not found");
+      throw new AuthenticationError("Invalid credentials");
     }
 
     if (!user.isActive) {
-      throw new AuthenticationError("Account is deactivated");
+      throw new AuthenticationError("Invalid credentials");
     }
 
     // Verify password
@@ -126,7 +124,7 @@ export class AuthService {
     return user;
   }
 
-  static async listUsers(requestingUserId: string) {
+  static async listUsers() {
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -164,7 +162,7 @@ export class AuthService {
           }
       }
 
-      const updatedUser = await prisma.user.update({
+      return prisma.user.update({
           where: { id: userId },
           data: {
               email,
@@ -172,8 +170,17 @@ export class AuthService {
               lastName,
               role,
           },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            role: true,
+            employee_code: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+          },
       });
-
-      return updatedUser;
   }
 }

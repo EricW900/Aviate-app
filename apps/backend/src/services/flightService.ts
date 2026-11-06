@@ -1,9 +1,9 @@
 import prisma from "../config/database";
-import { bulkGetFlightRequest, createCrewRequest, createFlightRequest, editCrewRequest, editFlightRequest, getCrewRequest, getFlightRequest, flightsRequest } from "../types/flight";
+import { bulkGetFlightRequest, createCrewRequest, createFlightRequest, editCrewRequest, editFlightRequest, getCrewRequest, getFlightRequest } from "../types/flight";
 import { ConflictError, NotFoundError, ValidationError } from "../utils/errors";
 
 export class flightService {
-    static async create(req: createFlightRequest, user: any) {
+    static async create(req: createFlightRequest) {
 
         const routeExists = await prisma.route.findFirst({
             where: { id: req.routeId }
@@ -21,23 +21,32 @@ export class flightService {
             throw new NotFoundError("Cannot create flight! Aircraft doesn't exists");
         }
 
-        const flightNumber = `RG - ${req.flightNumber}`;
-
-        const flightNumberExists = await prisma.flight.findFirst({
-            where: {
-                flightNumber: flightNumber,
-            }
-        });
-
-        if (flightNumberExists) {
-            throw new ConflictError("Flight number already exists");
+        if (aircraftExists.status !== "ACTIVE") {
+            throw new ValidationError("Only active aircraft can be assigned to a flight");
         }
+
+        if (aircraftExists.rangeKm < routeExists.distanceKm) {
+            throw new ValidationError("Aircraft cannot perform this route (insufficient range)");
+        }
+
+        const flightNumber = `RG - ${req.flightNumber}`;
 
         const departureTime = new Date(req.departureTime);
         const arrivalTime = new Date(req.arrivalTime);
 
         if (departureTime >= arrivalTime) {
             throw new ValidationError("Departure time must be before arrival time");
+        }
+
+        const flightNumberExists = await prisma.flight.findFirst({
+            where: {
+                flightNumber: flightNumber,
+                departureTime,
+            }
+        });
+
+        if (flightNumberExists) {
+            throw new ConflictError("Flight number already exists");
         }
 
         const concurrentFlights = await prisma.flight.findMany({
@@ -62,27 +71,20 @@ export class flightService {
             throw new ValidationError("Aircraft is already assigned to another flight during this time");
         }
 
-        try {
-            const newFlight = await prisma.flight.create({
-                data: {
-                    flightNumber,
-                    routeId: req.routeId,
-                    aircraftId: req.aircraftId,
-                    departureTime, // Date
-                    arrivalTime,   // Date
-                    status: req.status
-                }
-            });
+        return prisma.flight.create({
+            data: {
+                flightNumber,
+                routeId: req.routeId,
+                aircraftId: req.aircraftId,
+                departureTime,
+                arrivalTime,
+                status: req.status
+            }
+        });
+    }
 
-            return newFlight;
-        } catch (error) {
-            throw new Error("Error creating flight");
-        }
-    };
-
-    static async get(req: getFlightRequest, user: any) {
-        try {
-            const flight = await prisma.flight.findUnique({
+    static async get(req: getFlightRequest) {
+        const flight = await prisma.flight.findUnique({
                 where: {
                     id: req.flightId
                 },
@@ -125,17 +127,17 @@ export class flightService {
                         }
                     }
                 }
-            });
+        });
 
-            return flight;
-        } catch (error) {
-            throw new NotFoundError("Cannot get flight");
+        if (!flight) {
+            throw new NotFoundError("Flight not found");
         }
-    };
 
-    static async flights(req: flightsRequest, user: any) {
-        try {
-            const flights = await prisma.flight.findMany({
+        return flight;
+    }
+
+    static async flights() {
+        return prisma.flight.findMany({
                 select: {
                     flightNumber: true,
                     departureTime: true,
@@ -175,20 +177,14 @@ export class flightService {
                         }
                     }
                 }
-            });
+        });
+    }
 
-            return flights;
-        } catch (error) {
-            throw new NotFoundError("Cannot get flights");
-        }
-    };
-
-    static async bulkGet(req: bulkGetFlightRequest, user: any) {
-        try {
-            const flights = await prisma.flight.findMany({
+    static async bulkGet(req: bulkGetFlightRequest) {
+        return prisma.flight.findMany({
                 where: {
                     id: {
-                        in: req.flightId,
+                        in: req.flightIds,
                     }
                 },
                 select: {
@@ -230,22 +226,17 @@ export class flightService {
                         }
                     }
                 }
-            });
-
-            return flights;
-        } catch (error) {
-            throw new NotFoundError("Cannot get flights");
-        }
+        });
     }
 
-    static async edit(req: editFlightRequest, user: any) {
+    static async edit(req: editFlightRequest) {
         const routeExists = await prisma.route.findFirst({
             where: { id: req.routeId }
         });
 
         if (!routeExists) {
             throw new NotFoundError("Cannot edit flight! Route doesn't exists");
-        };
+        }
 
         const aircraftExists = await prisma.aircraft.findUnique({
             where: { id: req.aircraftId }
@@ -253,43 +244,28 @@ export class flightService {
 
         if (!aircraftExists) {
             throw new NotFoundError("Cannot edit flight! Aircraft doesn't exists");
-        };
-
-        const routeDistance = await prisma.route.findFirst({
-            where: {
-                id: req.routeId,
-            },
-            select: {
-                distanceKm: true,
-            }
-        });
-
-        const aircraftAutonomy = await prisma.aircraft.findFirst({
-            where: {
-                id: req.aircraftId,
-            },
-            select: {
-                rangeKm: true,
-            }
-        });
-
-        if (!routeDistance) {
-            throw new NotFoundError("Route not found");
         }
 
-        if (!aircraftAutonomy) {
-            throw new NotFoundError("Aircraft not found");
+        if (aircraftExists.status !== "ACTIVE") {
+            throw new ValidationError("Only active aircraft can be assigned to a flight");
         }
 
-        if (aircraftAutonomy.rangeKm < routeDistance.distanceKm) {
+        if (aircraftExists.rangeKm < routeExists.distanceKm) {
             throw new ValidationError("Aircraft cannot perform this route (insufficient range)");
         }
 
-
         const flightNumber = `RG - ${req.flightNumber}`;
+        const departureTime = new Date(req.departureTime);
+        const arrivalTime = new Date(req.arrivalTime);
+
+        if (departureTime >= arrivalTime) {
+            throw new ValidationError("Departure time must be before arrival time");
+        }
+
         const flightNumberExists = await prisma.flight.findFirst({
             where: {
                 flightNumber: flightNumber,
+                departureTime,
                 NOT: {
                     id: req.flightId
                 }
@@ -300,13 +276,6 @@ export class flightService {
             throw new ConflictError("Flight number exists! Cannot edit route");
         }
 
-        const departureTime = new Date(req.departureTime);
-        const arrivalTime = new Date(req.arrivalTime);
-
-        if (departureTime >= arrivalTime) {
-            throw new ValidationError("Departure time must be before arrival time");
-        }
-
         const concurrentFlights = await prisma.flight.findMany({
             where: {
                 aircraftId: req.aircraftId,
@@ -332,28 +301,22 @@ export class flightService {
             throw new ValidationError("Aircraft is already assigned to another flight during this time");
         }
 
-        try {
-            const newFlight = await prisma.flight.update({
-                where: {
-                    id: req.flightId,
-                },
-                data: {
-                    flightNumber,
-                    routeId: req.routeId,
-                    aircraftId: req.aircraftId,
-                    departureTime, // Date
-                    arrivalTime,   // Date
-                    status: req.status
-                }
-            });
-
-            return newFlight;
-        } catch (error) {
-            throw new Error("Error editing flight");
-        }
+        return prisma.flight.update({
+            where: {
+                id: req.flightId,
+            },
+            data: {
+                flightNumber,
+                routeId: req.routeId,
+                aircraftId: req.aircraftId,
+                departureTime,
+                arrivalTime,
+                status: req.status
+            }
+        });
     }
 
-    static async createCrew(req: createCrewRequest, user: any) {
+    static async createCrew(req: createCrewRequest) {
 
         const flight = await prisma.flight.findUnique({
             where: { id: req.flightId },
@@ -431,27 +394,16 @@ export class flightService {
             }
         }
 
-        try {
-            const crew = await prisma.flightCrew.create({
-                data: {
-                    flightId: req.flightId,
-                    userId: req.userId,
-                    role: req.role
-                }
-            });
-
-            return crew;
-
-        } catch (error: any) {
-            if (error.code === "P2002") {
-                throw new ConflictError("Crew already exists for this flight");
+        return prisma.flightCrew.create({
+            data: {
+                flightId: req.flightId,
+                userId: req.userId,
+                role: req.role
             }
-
-            throw new Error("Error creating flight crew");
-        }
+        });
     }
 
-    static async getCrew(req: getCrewRequest, user: any) {
+    static async getCrew(req: getCrewRequest) {
 
         const flight = await prisma.flight.findUnique({
             where: {
@@ -492,7 +444,7 @@ export class flightService {
         return flight;
     }
 
-    static async editCrew(req: editCrewRequest, user: any) {
+    static async editCrew(req: editCrewRequest) {
 
         const flight = await prisma.flight.findUnique({
             where: { id: req.flightId }
@@ -500,6 +452,10 @@ export class flightService {
 
         if (!flight) {
             throw new NotFoundError("Flight not found");
+        }
+
+        if (flight.status === "COMPLETED" || flight.status === "CANCELLED") {
+            throw new ValidationError("Cannot edit crew on a finished or cancelled flight");
         }
 
         const crewExists = await prisma.flightCrew.findUnique({
@@ -510,6 +466,10 @@ export class flightService {
 
         if (!crewExists) {
             throw new NotFoundError("Crew not found");
+        }
+
+        if (crewExists.flightId !== req.flightId) {
+            throw new ValidationError("Crew does not belong to the informed flight");
         }
 
         const newUser = await prisma.user.findUnique({
@@ -574,21 +534,14 @@ export class flightService {
             }
         }
 
-        try {
-            const updatedCrew = await prisma.flightCrew.update({
-                where: {
-                    id: req.crewId
-                },
-                data: {
-                    userId: req.userId,
-                    role: req.role
-                }
-            });
-
-            return updatedCrew;
-
-        } catch (error) {
-            throw new Error("Error updating crew");
-        }
+        return prisma.flightCrew.update({
+            where: {
+                id: req.crewId
+            },
+            data: {
+                userId: req.userId,
+                role: req.role
+            }
+        });
     }
 }

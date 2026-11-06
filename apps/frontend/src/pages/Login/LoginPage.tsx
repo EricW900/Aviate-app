@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useAlert } from "../../context/AlertContext";
 import React from "react";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 
 const LoginPage = () => {
     const { login } = useAuth();
@@ -23,10 +24,8 @@ const LoginPage = () => {
             showAlert("Login Feito com Sucesso!", "success");
 
             navigate("/dashboard");
-        } catch (error: any) {
-            const message = error?.response?.data?.message || "Credenciais Inválidas";
-
-            showAlert(message, "error");
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Invalid credentials"), "error");
         }
     };
 

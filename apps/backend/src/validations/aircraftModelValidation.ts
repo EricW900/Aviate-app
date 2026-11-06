@@ -8,11 +8,7 @@ export const createAircraftModelSchema = Joi.object({
 })
 
 export const getAircraftModelSchema = Joi.object({
-    ids: Joi.array().items(Joi.string().required()).required(),
-})
-
-export const listAircraftModelSchema = Joi.object({
-
+    aircraftModelIds: Joi.array().items(Joi.string().required()).min(1).unique().required(),
 })
 
 export const editAircraftModelSchema = Joi.object({

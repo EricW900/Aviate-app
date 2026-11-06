@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { useAlert } from "../../../context/AlertContext";
 import {
     createAircraftModel,
@@ -11,6 +12,7 @@ import type {
     AircraftModel,
     Manufacturer,
 } from "../services/aircraftModelService";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 const ModelSection = () => {
     const { showAlert } = useAlert();
@@ -27,7 +29,7 @@ const ModelSection = () => {
     const [editingName, setEditingName] = useState("");
     const [editingManufacturerId, setEditingManufacturerId] = useState("");
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         try {
             setLoading(true);
 
@@ -37,28 +39,14 @@ const ModelSection = () => {
             ]);
 
             if (manufacturersResult.status === "fulfilled") {
-                const manufacturersData =
-                    manufacturersResult.value.data?.data ??
-                    manufacturersResult.value.data?.manufacturers ??
-                    manufacturersResult.value.data ??
-                    [];
-
-                setManufacturers(
-                    Array.isArray(manufacturersData) ? manufacturersData : []
-                );
+                setManufacturers(manufacturersResult.value.data.data);
             } else {
                 console.error("Failed to load manufacturers:", manufacturersResult.reason);
                 showAlert("Failed to load manufacturers", "error");
             }
 
             if (modelsResult.status === "fulfilled") {
-                const modelsData =
-                    modelsResult.value.data?.data ??
-                    modelsResult.value.data?.models ??
-                    modelsResult.value.data ??
-                    [];
-
-                setModels(Array.isArray(modelsData) ? modelsData : []);
+                setModels(modelsResult.value.data.data);
             } else {
                 console.error("Failed to load aircraft models:", modelsResult.reason);
                 showAlert("Failed to load aircraft models", "error");
@@ -66,7 +54,7 @@ const ModelSection = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [showAlert]);
 
     const startEdit = (model: AircraftModel) => {
         setEditingId(model.id);
@@ -112,12 +100,8 @@ const ModelSection = () => {
             cancelEdit();
 
             await loadData();
-        } catch (error: any) {
-            showAlert(
-                error?.response?.data?.message ||
-                "Could not update aircraft model",
-                "error"
-            );
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Could not update aircraft model"), "error");
         } finally {
             setSaving(false);
         }
@@ -125,7 +109,7 @@ const ModelSection = () => {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [loadData]);
 
     const handleCreate = async (e: FormEvent) => {
         e.preventDefault();
@@ -152,11 +136,8 @@ const ModelSection = () => {
             setName("");
             setManufacturerId("");
             await loadData();
-        } catch (error: any) {
-            showAlert(
-                error?.response?.data?.message || "Could not create model",
-                "error"
-            );
+        } catch (error: unknown) {
+            showAlert(getErrorMessage(error, "Could not create model"), "error");
         } finally {
             setSaving(false);
         }

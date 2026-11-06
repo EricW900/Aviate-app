@@ -1,4 +1,5 @@
 import api from "../../../api/axios";
+import type { ApiResponse } from "../../../types/api";
 
 export interface RouteAirport {
     name: string;
@@ -17,6 +18,17 @@ export interface Route {
     destination: RouteAirport;
 }
 
+export interface CreateRouteRequest {
+    originId: string;
+    destinationId: string;
+    distanceKm: number;
+    estimatedTime: number;
+}
+
+export const createRoute = async (payload: CreateRouteRequest) => {
+    return api.post<ApiResponse<Route>>("/route/create", payload);
+};
+
 export const listRoutes = async () => {
-    return api.get("/route/list");
+    return api.get<ApiResponse<Route[]>>("/route/list");
 };

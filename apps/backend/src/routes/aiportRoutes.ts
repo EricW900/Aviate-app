@@ -1,32 +1,33 @@
 import { Router } from "express";
 import { validateRequest } from "../middleware/validation";
-import { authenticate } from "../middleware/auth";
+import { authenticate, authorize } from "../middleware/auth";
 import { airportController } from "../controllers/airportController";
-import { createAirportSchema, editAirportSchema, getAirportSchema, listAirportSchema } from "../validations/aiportValidation";
+import { createAirportSchema, editAirportSchema, getAirportSchema } from "../validations/aiportValidation";
 
 const router = Router();
 
 router.post("/create",
     authenticate,
+    authorize("ADMIN"),
     validateRequest(createAirportSchema),
     airportController.create
 )
 
-router.post("/edit",
+router.patch("/edit",
     authenticate,
+    authorize("ADMIN"),
     validateRequest(editAirportSchema),
     airportController.edit,
 )
 
-router.get("/get",
+router.get("/get/:icaoCode",
     authenticate,
-    validateRequest(getAirportSchema),
+    validateRequest(getAirportSchema, "params"),
     airportController.get,
 )
 
 router.get("/list",
     authenticate,
-    validateRequest(listAirportSchema),
     airportController.list,
 )
 

@@ -7,7 +7,7 @@ export const createFlightSchema = Joi.object({
     aircraftId: Joi.string().required(),
     departureTime: Joi.date().required(),
     arrivalTime: Joi.date().required(),
-    status: Joi.string().valid(...Object.values(FlightStatus)),
+    status: Joi.string().valid(...Object.values(FlightStatus)).default("SCHEDULED"),
 });
 
 export const getFlightSchema = Joi.object({
@@ -15,12 +15,8 @@ export const getFlightSchema = Joi.object({
 });
 
 export const bulkGetFlightSchema = Joi.object({
-    flightIds: Joi.array().items(Joi.string().required()).required()
+    flightIds: Joi.array().items(Joi.string().required()).min(1).unique().required()
 });
-
-export const flightsSchema = Joi.object({
-
-})
 
 export const editFlightSchema = Joi.object({
     flightId: Joi.string().required(),

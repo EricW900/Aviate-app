@@ -18,7 +18,3 @@ export interface editAirportRequest {
 export interface getAirportRequest {
     icaoCode: string,
 }
-
-export interface listAirportRequest {
-
-}

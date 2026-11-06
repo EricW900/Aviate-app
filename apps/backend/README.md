@@ -80,6 +80,13 @@ GET /api/v1/auth/profile
 Authorization: Bearer <jwt_token>
 ```
 
+Public registration always creates a `SYSTEM_USER`. The following user-management
+endpoints require an authenticated `ADMIN`:
+
+- `POST /api/v1/auth/create-user`
+- `GET /api/v1/auth/list-users`
+- `PATCH /api/v1/auth/edit/:userId`
+
 ### System Endpoints
 
 #### Health Check

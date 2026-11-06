@@ -1,9 +1,10 @@
 import {
     createContext,
-    ReactNode,
+    useCallback,
     useContext,
     useState,
 } from "react";
+import type { ReactNode } from "react";
 
 type AlertType = "success" | "error";
 
@@ -26,7 +27,7 @@ export const AlertProvider = ({
 }) => {
     const [alert, setAlert] = useState<AlertData | null>(null);
 
-    const showAlert = (
+    const showAlert = useCallback((
         message: string,
         type: AlertType
     ) => {
@@ -38,7 +39,7 @@ export const AlertProvider = ({
         setTimeout(() => {
             setAlert(null);
         }, 3000);
-    };
+    }, []);
 
     return (
         <AlertContext.Provider

@@ -10,22 +10,13 @@ export const createAircraftSchema = Joi.object({
 
 export const editAircraftSchema = Joi.object({
     aircraftId: Joi.string().required(),
-    prefix: Joi.string().min(3).max(10),
+    prefix: Joi.string().min(3).max(10).required(),
     modelId: Joi.string().required(),
     capacity: Joi.number().positive().required(),
     rangeKm: Joi.number().positive().required(),
-    status: Joi.string().valid(...Object.values(AircraftStatus)),
+    status: Joi.string().valid(...Object.values(AircraftStatus)).required(),
 })
 
 export const getAircraftSchema = Joi.object({
-    ids: Joi.array().items(Joi.string().required()).required(),
+    aircraftIds: Joi.array().items(Joi.string().required()).min(1).unique().required(),
 })
-
-export const listAircraftSchema = Joi.object({
-
-})
-
-//// Not necessary in this case because there's no delete, only status "DEACTIVATED"
-// export const deleteAircraftSchema = Joi.object({
-//     aircraftId: Joi.string().required(),
-// })

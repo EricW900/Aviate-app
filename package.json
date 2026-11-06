@@ -7,7 +7,11 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=aviate-frontend\" \"npm run dev --workspace=express-auth-backend\""
+    "dev": "concurrently \"npm run dev --workspace=aviate-frontend\" \"npm run dev --workspace=express-auth-backend\"",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "check": "npm run lint && npm run test && npm run build"
   },
   "repository": {
     "type": "git",

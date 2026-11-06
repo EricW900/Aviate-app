@@ -4,8 +4,12 @@ export interface LoginPayload {
 }
 
 export interface User {
-    userId: string;
+    id: string;
     email: string;
+    firstName?: string;
+    lastName?: string;
+    role: "ADMIN" | "PILOT" | "FIRST_OFFICER" | "FLIGHT_ENGINEER" | "CABIN_CREW" | "SYSTEM_USER";
+    employee_code: string;
 }
 
 export interface AuthResponse {
